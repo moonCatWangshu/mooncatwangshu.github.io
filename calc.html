@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>计算器</title>
+<style>
+body {
+	font-size: 32px;
+}
+a {
+	text-decoration: none;
+	color: #fff;
+	display: block;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	background-color: gray;
+}
+</style>
+<script>
+var hasDecimalPoint = false;
+var lastResult = 0;
+var operator = null;
+var fromStart = true;
+var displayingResult = false;
+
+// 追加数字
+function appendNum(num) {
+	var resultPad = document.getElementById("result");
+	if (displayingResult) {
+		clearResultPad();
+		displayingResult = false;
+	}
+	if (num == '.' && hasDecimalPoint) {
+		return;
+	} else if (num == '.') {
+		hasDecimalPoint = true;
+	}
+
+	if (resultPad.innerText == '0') {
+		resultPad.innerText = (num == '.') ? '0.' : num;
+	} else {
+		resultPad.innerText = resultPad.innerText + num;
+	}
+}
+
+// 清空
+function clearResultPad() {
+	var resultPad = document.getElementById("result");
+	resultPad.innerText = '0';
+	hasDecimalPoint = false;
+}
+
+// 重置
+function reset() {
+	clearResultPad();
+	displayingResult = false;
+	fromStart = true;
+	operator = null;
+	lastResult = 0;
+}
+
+// 正负数变化
+function togglePlusMinus() {
+	var resultPad = document.getElementById("result");
+	if (resultPad.innerText == '0') {
+		//
+	} else if (resultPad.innerText[0] == '-') {
+		resultPad.innerText = resultPad.innerText.substr(1, resultPad.innerText.length - 1);
+	} else {
+		resultPad.innerText = '-' + resultPad.innerText;
+	}
+}
+
+// 退格
+function Backspace() {
+	var resultPad = document.getElementById("result");
+	if (resultPad.innerText.length > 1 && !(resultPad.innerText.length == 2 && resultPad.innerText[0] == '-')) {
+		resultPad.innerText = resultPad.innerText.substr(0, resultPad.innerText.length - 1);
+	} else {
+		resultPad.innerText = '0';
+	}
+	if (resultPad.innerText[resultPad.innerText.length - 1] == '.') {
+		Backspace();
+		hasDecimalPoint = false;
+	}
+}
+
+// 更换运算符
+function popOperator(newOperator) {
+	var resultPad = document.getElementById("result");
+	if (fromStart) {
+		lastResult = parseFloat(resultPad.innerText);
+		operator = newOperator;
+		fromStart = false;
+		displayingResult = true;
+	} else if (operator) {
+		calcResult();
+		clearResultPad();
+		resultPad.innerText = lastResult;
+		operator = newOperator;
+		displayingResult = true;
+	} else {
+		operator = newOperator;
+	}
+}
+
+// 算出之前的结果
+function calcResult() {
+	if (displayingResult) {
+		return;
+	}
+	var resultPad = document.getElementById("result");
+	var currentNum = parseFloat(resultPad.innerText);
+	switch (operator) {
+		case '+':
+			lastResult += currentNum;
+			break;
+		case '-':
+			lastResult -= currentNum;
+			break;
+		case '*':
+			lastResult *= currentNum;
+			break;
+		case '/':
+			lastResult /= currentNum;
+			break;
+	}
+	operator = null;
+}
+
+// 算出当前结果
+function showCurrentResult() {
+	var resultPad = document.getElementById("result");
+	calcResult();
+	clearResultPad();
+	resultPad.innerText = lastResult;
+	operator = null;
+	displayingResult = true;
+}
+
+</script>
+</head>
+<body>
+	<table style="width: 300px;">
+		<tr>
+			<td colspan="4" style="text-align:right" id="result">0</td>
+		</tr>
+		<tr>
+			<td><a href="javascript:void(0)" onclick="Backspace();">«</a></td>
+			<td><a href="javascript:void(0)" onclick="reset();">c</a></td>
+			<td><a href="javascript:void(0)" onclick="togglePlusMinus();">±</a></td>
+			<td><a href="#javascript:void(0)" onclick="popOperator('/');">/</a></td>
+		</tr>
+		<tr>
+			<td><a href="javascript:void(0)" onclick="appendNum(7);">7</a></td>
+			<td><a href="javascript:void(0)" onclick="appendNum(8);">8</a></td>
+			<td><a href="javascript:void(0)" onclick="appendNum(9);">9</a></td>
+			<td><a href="javascript:void(0)" onclick="popOperator('*');">*</a></td>
+		</tr>
+		<tr>
+			<td><a href="javascript:void(0)" onclick="appendNum(4)">4</a></td>
+			<td><a href="javascript:void(0)" onclick="appendNum(5)">5</a></td>
+			<td><a href="javascript:void(0)" onclick="appendNum(6)">6</a></td>
+			<td><a href="javascript:void(0)" onclick="popOperator('-');">-</a></td>
+		</tr>
+		<tr>
+			<td><a href="javascript:void(0)" onclick="appendNum(1)">1</a></td>
+			<td><a href="javascript:void(0)" onclick="appendNum(2)">2</a></td>
+			<td><a href="javascript:void(0)" onclick="appendNum(3)">3</a></td>
+			<td><a href="javascript:void(0)" onclick="popOperator('+');">+</a></td>
+		</tr>
+		<tr>
+			<td colspan="2"><a href="javascript:void(0)" onclick="appendNum(0)">0</a></td>
+			<td><a href="javascript:void(0)" onclick="appendNum('.')">.</a></td>
+			<td><a href="javascript:void(0)" onclick="showCurrentResult();">=</a></td>
+		</tr>
+	</table>
+</body>
+</html>
